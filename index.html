@@ -3,549 +3,673 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>sussyswimmer — software that listens</title>
-<meta name="description" content="Portfolio of sussyswimmer: desktop apps that glow and sing along with your music, a workshop for AI coding agents, and small tools for writing.">
-<meta name="color-scheme" content="dark">
-<meta property="og:title" content="sussyswimmer — software that listens">
-<meta property="og:image" content="media/hero.jpg">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%2307060B'/%3E%3Crect x='7' y='12' width='3' height='9' rx='1.5' fill='%237C5CFF'/%3E%3Crect x='12.5' y='8' width='3' height='17' rx='1.5' fill='%2322D3EE'/%3E%3Crect x='18' y='11' width='3' height='11' rx='1.5' fill='%23A78BFA'/%3E%3Crect x='23.5' y='14' width='3' height='6' rx='1.5' fill='%2322D3EE'/%3E%3C/svg%3E">
+<title>sussyswimmer · desktop apps and tools for AI agents</title>
+<meta name="description" content="Portfolio of sussyswimmer: desktop apps that light up and sing along with your music, a workshop for running AI coding agents, and small tools for writing.">
+<meta name="color-scheme" content="light">
+<meta name="theme-color" content="#f6f7f7">
+<meta property="og:title" content="sussyswimmer · desktop apps and tools for AI agents">
+<meta property="og:description" content="Desktop apps that react to your music, a workshop for AI coding agents, and small tools for writing.">
+<meta property="og:image" content="media/repos/rimlight.jpg">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23121417'/%3E%3Ctext x='16' y='21.5' text-anchor='middle' font-family='Arial,sans-serif' font-weight='800' font-size='15' fill='%23fff'%3Ess%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,200..800&family=Hanken+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
+<script>
+  /* Before first paint: JS is on, and motion follows the visitor's setting
+     unless they chose otherwise with the footer toggle. */
+  (function () {
+    var d = document.documentElement, pref = null;
+    d.setAttribute('data-js', '');
+    try { pref = localStorage.getItem('motion'); } catch (e) {}
+    var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+    d.setAttribute('data-motion', pref || (reduce ? 'reduce' : 'full'));
+  })();
+</script>
 <style>
-/* Rim colors are registered so they can transition when the page re-colors itself per project. */
-@property --c1 { syntax: '<color>'; inherits: true; initial-value: #7C5CFF; }
-@property --c2 { syntax: '<color>'; inherits: true; initial-value: #22D3EE; }
-@property --c3 { syntax: '<color>'; inherits: true; initial-value: #A78BFA; }
-
+/* =========================================================================
+   Painted Rooms, the same system as maxwellolander.com: cool gallery white,
+   softly painted rooms, one cobalt for interaction. Light only.
+   ========================================================================= */
 :root {
-  --ink: #07060B;
-  --surface: #110F1A;
-  --surface-2: #171424;
-  --line: rgba(237, 234, 246, .10);
-  --line-strong: rgba(237, 234, 246, .22);
-  --text: #EDEAF6;
-  --muted: #A7A2BD;
+  --paper: #f6f7f7;
+  --plate: #e4e7e9;
+  --stripe: #cdd2d7;
+  --ink: #121417;
+  --ink-2: #3d434b;
+  --ink-3: #565d67;
+  --rule: #d3d8dc;
+  --line-strong: #737b85;
+  --accent: #2536c4;
+  --accent-press: #1a2896;
+  --status-live: #17693e;
+  --status-building: #8a4f00;
 
-  --c1: #7C5CFF; --c2: #22D3EE; --c3: #A78BFA;
+  /* Rooms: wall, deep (secondary text on that wall), plate */
+  --wall-gallery: #f6f7f7;     --deep-gallery: #121417;     --plate-gallery: #e4e7e9;
+  --wall-highlighter: #f7eea8; --deep-highlighter: #5b4800; --plate-highlighter: #ebd75a;
+  --wall-celadon: #d3eadf;     --deep-celadon: #0c5036;     --plate-celadon: #9fd0b8;
+  --wall-periwinkle: #e2e1fa;  --deep-periwinkle: #3a33a3;  --plate-periwinkle: #bdbaf2;
+  --wall-apricot: #fbe1cd;     --deep-apricot: #893808;     --plate-apricot: #f4b98e;
+  --wall-fern: #e3ecd0;        --deep-fern: #3b5710;        --plate-fern: #c2d69a;
+  --wall-blueprint: #dde7f4;   --deep-blueprint: #1d4d8c;   --plate-blueprint: #b3c9e8;
+  --wall-pool: #d5eaf2;        --deep-pool: #0a536e;        --plate-pool: #a5d3e4;
 
-  --display: 'Bricolage Grotesque', 'Hanken Grotesk', sans-serif;
-  --body: 'Hanken Grotesk', sans-serif;
-  --mono: 'JetBrains Mono', ui-monospace, monospace;
+  --display: 'Bricolage Grotesque', ui-sans-serif, system-ui, sans-serif;
+  --text: 'Hanken Grotesk', ui-sans-serif, system-ui, sans-serif;
 
-  --s1: 4px; --s2: 8px; --s3: 12px; --s4: 16px; --s5: 24px;
-  --s6: 32px; --s7: 48px; --s8: 64px; --s9: 96px; --s10: 144px;
-  --r-sm: 10px; --r-md: 16px; --r-lg: 24px;
-  --gutter: clamp(16px, 5vw, 64px);
-  --max: 1280px;
-  --ease-out: cubic-bezier(.16, 1, .3, 1);
+  --radius-control: 10px;
+  --radius-plate: 16px;
+  --radius-panel: 24px;
+  --gutter: clamp(20px, 2.8vw, 40px);
+  --section: clamp(4rem, 2rem + 4vw, 6rem);
+  --shadow-print: 0 1px 2px rgb(18 20 23 / .06), 0 28px 56px -28px rgb(18 20 23 / .28);
 
-  transition: --c1 .9s ease, --c2 .9s ease, --c3 .9s ease;
+  --ease-out: cubic-bezier(.23, 1, .32, 1);
+  --ease-in-out: cubic-bezier(.77, 0, .175, 1);
+  --dur-press: 140ms;
+  --dur-hover: 180ms;
+  --dur-tab: 280ms;
+  --dur-roller: 700ms;
 }
 
+[data-wall="gallery"]     { --wall: var(--wall-gallery);     --deep: var(--deep-gallery);     --room-plate: var(--plate-gallery); }
+[data-wall="highlighter"] { --wall: var(--wall-highlighter); --deep: var(--deep-highlighter); --room-plate: var(--plate-highlighter); }
+[data-wall="celadon"]     { --wall: var(--wall-celadon);     --deep: var(--deep-celadon);     --room-plate: var(--plate-celadon); }
+[data-wall="periwinkle"]  { --wall: var(--wall-periwinkle);  --deep: var(--deep-periwinkle);  --room-plate: var(--plate-periwinkle); }
+[data-wall="apricot"]     { --wall: var(--wall-apricot);     --deep: var(--deep-apricot);     --room-plate: var(--plate-apricot); }
+[data-wall="fern"]        { --wall: var(--wall-fern);        --deep: var(--deep-fern);        --room-plate: var(--plate-fern); }
+[data-wall="blueprint"]   { --wall: var(--wall-blueprint);   --deep: var(--deep-blueprint);   --room-plate: var(--plate-blueprint); }
+[data-wall="pool"]        { --wall: var(--wall-pool);        --deep: var(--deep-pool);        --room-plate: var(--plate-pool); }
+
+/* ---------- Base ---------- */
 *, *::before, *::after { box-sizing: border-box; }
-html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+html {
+  color-scheme: light;
+  background: var(--paper);
+  color: var(--ink);
+  scrollbar-color: var(--line-strong) var(--paper);
+  scroll-padding-top: 24px;
+  overflow-x: clip;
+  -webkit-text-size-adjust: 100%;
+  font-synthesis-style: none;
+}
+html[data-motion="full"] { scroll-behavior: smooth; }
 body {
   margin: 0;
-  background: var(--ink);
-  color: var(--text);
-  font: 400 17px/1.6 var(--body);
-  overflow-x: hidden;
+  background: transparent;
+  font: 400 1.0625rem/1.6 var(--text);
   -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
-img, video { display: block; max-width: 100%; }
-a { color: inherit; }
-:focus-visible { outline: 2px solid var(--c2); outline-offset: 3px; border-radius: 4px; }
+@media (min-width: 768px) { body { font-size: 1.125rem; } }
+img { display: block; max-width: 100%; height: auto; }
+a { color: inherit; text-decoration: none; }
+h1, h2, h3, p, ul, dl, dd, figure { margin: 0; }
+h1, h2, h3 { font-weight: 600; text-wrap: balance; }
+p { text-wrap: pretty; }
+ul { padding: 0; list-style: none; }
+::selection { background: var(--accent); color: #fff; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+* { caret-color: var(--accent); }
+.sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
 .skip {
-  position: absolute; left: var(--s4); top: -100px; z-index: 100;
-  background: var(--text); color: var(--ink); padding: var(--s3) var(--s4); border-radius: var(--r-sm);
+  position: fixed; left: 16px; top: -100px; z-index: 100;
+  background: var(--ink); color: #fff; padding: 12px 18px; border-radius: 999px; font-weight: 600;
 }
-.skip:focus { top: var(--s4); }
-.wrap { width: 100%; max-width: var(--max); margin: 0 auto; padding: 0 var(--gutter); }
-.mono { font-family: var(--mono); font-size: 13px; letter-spacing: .02em; }
+.skip:focus { top: 16px; }
 
-/* ---------- The rim: the page's edges glow like Rimlight does ---------- */
-.rim { position: fixed; inset: 0; pointer-events: none; z-index: 60; animation: beat .5s var(--ease-out) infinite; }
-.rim span { position: absolute; overflow: hidden; }
-.rim span::before {
-  content: ""; position: absolute; inset: 0 -200% 0 0;
-  background: linear-gradient(90deg, var(--c1), var(--c2), var(--c3), var(--c1), var(--c2), var(--c3), var(--c1));
-  animation: flow 9s linear infinite;
+/* ---------- Type ---------- */
+.type-display {
+  font-family: var(--display); font-weight: 720; font-stretch: 80%;
+  font-size: clamp(3.25rem, 2rem + 5.2vw, 6rem); line-height: .9; letter-spacing: -.03em;
 }
-.rim .t, .rim .b { left: 0; right: 0; height: 22px; }
-.rim .l, .rim .r { top: 0; bottom: 0; width: 22px; }
-.rim .t { top: 0; -webkit-mask: linear-gradient(#000, transparent); mask: linear-gradient(#000, transparent); }
-.rim .b { bottom: 0; -webkit-mask: linear-gradient(transparent, #000); mask: linear-gradient(transparent, #000); }
-.rim .l { left: 0; -webkit-mask: linear-gradient(90deg, #000, transparent); mask: linear-gradient(90deg, #000, transparent); }
-.rim .r { right: 0; -webkit-mask: linear-gradient(270deg, #000, transparent); mask: linear-gradient(270deg, #000, transparent); }
-.rim .l::before, .rim .r::before {
-  inset: 0 0 -200% 0;
-  background: linear-gradient(180deg, var(--c2), var(--c3), var(--c1), var(--c2), var(--c3), var(--c1), var(--c2));
-  animation-name: flow-y;
+.type-title {
+  font-family: var(--display); font-weight: 660; font-stretch: 84%;
+  font-size: clamp(2.25rem, 1.5rem + 3vw, 4.5rem); line-height: .95; letter-spacing: -.025em;
 }
-@keyframes flow { to { transform: translateX(-66.666%); } }
-@keyframes flow-y { to { transform: translateY(-66.666%); } }
-@keyframes beat { 0% { opacity: .95; } 100% { opacity: .5; } }
+.type-heading {
+  font-family: var(--display); font-weight: 600; font-stretch: 90%;
+  font-size: clamp(2rem, 1.25rem + 2.6vw, 3.75rem); line-height: 1.02; letter-spacing: -.02em; max-width: 18ch;
+}
+.type-subhead {
+  font-family: var(--display); font-weight: 600; font-stretch: 95%;
+  font-size: clamp(1.375rem, 1.1rem + .8vw, 1.875rem); line-height: 1.12; letter-spacing: -.01em;
+}
+.type-handle {
+  font-family: var(--display); font-weight: 500; font-stretch: 92%;
+  font-size: clamp(1.5rem, 1rem + 2vw, 2.75rem); line-height: 1.1; letter-spacing: -.01em;
+}
+.type-small { font-weight: 500; font-size: .9375rem; line-height: 1.45; }
+.lead { font-size: clamp(1.1875rem, 1rem + .6vw, 1.5rem); line-height: 1.45; max-width: 42ch; color: var(--ink-2); }
+.label { font-weight: 600; font-size: .8125rem; line-height: 1.2; color: var(--ink-3); }
+.measure { max-width: 65ch; }
 
-/* ---------- Nav ---------- */
-.nav {
-  position: fixed; top: 0; left: 0; right: 0; z-index: 50;
-  display: flex; align-items: center; justify-content: space-between; gap: var(--s4);
-  padding: var(--s4) var(--gutter);
-  background: linear-gradient(rgba(7, 6, 11, .85), rgba(7, 6, 11, 0));
-  border-bottom: 1px solid transparent;
-  transition: background-color .3s, border-color .3s, backdrop-filter .3s;
+/* ---------- Controls ---------- */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: .5rem;
+  height: var(--btn-h, 48px); padding-inline: var(--btn-pad, 24px);
+  border-radius: 999px; font: 600 var(--btn-size, 1rem)/1 var(--text);
+  white-space: nowrap; cursor: pointer; -webkit-tap-highlight-color: transparent;
+  transition: background-color var(--dur-hover) ease, color var(--dur-hover) ease,
+    border-color var(--dur-hover) ease, transform var(--dur-press) var(--ease-out);
 }
-.nav.scrolled { background: rgba(7, 6, 11, .78); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); border-bottom-color: var(--line); }
-.brand { display: inline-flex; align-items: center; gap: var(--s3); text-decoration: none; font: 600 16px/1 var(--display); letter-spacing: -.01em; min-height: 44px; }
-.eq { display: inline-flex; align-items: flex-end; gap: 3px; height: 16px; }
-.eq i { width: 3px; height: 100%; border-radius: 2px; background: var(--c2); transform-origin: bottom; animation: eq 1s ease-in-out infinite; }
-.eq i:nth-child(1) { background: var(--c1); animation-duration: .9s; }
-.eq i:nth-child(2) { animation-duration: .7s; animation-delay: -.3s; }
-.eq i:nth-child(3) { background: var(--c3); animation-duration: 1.1s; animation-delay: -.5s; }
-.eq i:nth-child(4) { animation-duration: .8s; animation-delay: -.2s; }
-@keyframes eq { 0%, 100% { transform: scaleY(.25); } 50% { transform: scaleY(1); } }
-.nav ul { display: flex; align-items: center; gap: var(--s1); list-style: none; margin: 0; padding: 0; }
-.nav a:not(.brand), .motion-toggle {
-  display: inline-flex; align-items: center; min-height: 44px; padding: 0 var(--s3);
-  font: 500 14px/1 var(--body); color: var(--muted); text-decoration: none; border-radius: 999px;
-  transition: color .2s, background-color .2s;
+.btn:active { transform: scale(.97); }
+.btn-primary { background: var(--ink); color: #fff; border: 0; }
+.btn-primary:active { background: var(--accent-press); }
+.link {
+  color: var(--accent);
+  text-decoration: underline 1px color-mix(in srgb, currentColor 45%, transparent);
+  text-underline-offset: .2em;
+  transition: color var(--dur-hover) ease, text-decoration-color var(--dur-hover) ease;
 }
-.nav a:not(.brand):hover, .motion-toggle:hover { color: var(--text); background: rgba(237, 234, 246, .06); }
-.motion-toggle { background: none; border: 1px solid var(--line); cursor: pointer; gap: var(--s2); margin-left: var(--s2); }
-.motion-toggle svg { width: 12px; height: 12px; }
+.chip {
+  display: inline-flex; align-items: center; min-height: 32px; padding: 5px 12px;
+  border: 1px solid var(--chip-edge, var(--line-strong)); border-radius: var(--radius-control);
+  font-weight: 500; font-size: .875rem; line-height: 1.2; color: var(--ink);
+}
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.arrow { width: .95em; height: .95em; flex: none; vertical-align: -.12em; transition: translate var(--dur-hover) var(--ease-out); }
+a:focus-visible .arrow[data-dir="right"] { translate: 3px 0; }
+a:focus-visible .arrow[data-dir="out"] { translate: 2px -2px; }
+a:focus-visible .arrow[data-dir="up"] { translate: 0 -3px; }
+
+@media (hover: hover) and (pointer: fine) {
+  .btn-primary:hover { background: var(--accent); }
+  .btn-primary:active { background: var(--accent-press); }
+  .link:hover { color: var(--accent-press); text-decoration-thickness: 2px; text-decoration-color: currentColor; }
+  a:hover .arrow[data-dir="right"] { translate: 3px 0; }
+  a:hover .arrow[data-dir="out"] { translate: 2px -2px; }
+  a:hover .arrow[data-dir="up"] { translate: 0 -3px; }
+}
+
+/* Status tag: the one uppercase, tracked type on the page. */
+.status { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; }
+.status-tag {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-weight: 600; font-size: .8125rem; line-height: 1; letter-spacing: .06em; text-transform: uppercase;
+  color: var(--ink); white-space: nowrap;
+}
+.status-tag i { width: 6px; height: 6px; border-radius: 999px; flex: none; }
+.dot-live { background: var(--status-live); }
+.dot-building { background: var(--status-building); }
+.dot-built { background: var(--ink); }
+.dot-ring { box-shadow: inset 0 0 0 1.5px var(--line-strong); }
+.status-gloss { font-weight: 500; font-size: .9375rem; line-height: 1.45; color: var(--deep, var(--ink-3)); }
+
+/* ---------- Layout ---------- */
+.container { width: 100%; max-width: calc(1560px + 2 * var(--gutter)); margin-inline: auto; padding-inline: var(--gutter); }
+.section { padding-block: var(--section); }
+
+/* ---------- The wall: one fixed wall behind the page, crossfading room to room ---------- */
+.wall { position: fixed; inset: 0; z-index: -1; pointer-events: none; background: var(--wall-gallery); }
+.wall i { position: absolute; inset: 0; opacity: 0; transition: opacity 600ms var(--ease-in-out); }
+.wall i.on { opacity: 1; }
+/* Calm or no JS: every room paints its own wall. */
+html[data-motion="reduce"] [data-wall],
+html:not([data-js]) [data-wall] { background-color: var(--wall); }
+html[data-motion="reduce"] .wall,
+html:not([data-js]) .wall { display: none; }
+
+/* ---------- Chrome: monogram top left, "Say hi" top right ---------- */
+.monogram {
+  position: fixed; top: 20px; left: var(--gutter); z-index: 40;
+  display: grid; place-items: center; width: 40px; height: 40px;
+  border-radius: var(--radius-control); background: var(--ink); color: #fff;
+  font: 800 15px/1 var(--display); font-stretch: 75%;
+  transition: background-color var(--dur-tab) ease, transform var(--dur-press) var(--ease-out);
+}
+.monogram::after { content: ""; position: absolute; inset: -4px; }
+.monogram:active { transform: scale(.97); }
+.say-hi { position: fixed; top: 16px; right: var(--gutter); z-index: 40; }
+@media (max-width: 767.98px) {
+  .monogram { width: 36px; height: 36px; top: 16px; }
+  .say-hi { --btn-h: 44px; --btn-pad: 18px; --btn-size: .9375rem; top: 12px; }
+}
+
+/* ---------- The roller: a left-to-right wipe, the brand gesture ---------- */
+html[data-js][data-motion="full"] .roll {
+  clip-path: inset(-12% 100% -12% -2%);
+  transition: clip-path var(--dur-roller) var(--ease-out);
+  transition-delay: var(--d, 0ms);
+}
+html[data-js][data-motion="full"] .roll.in { clip-path: inset(-12% -2% -12% -2%); }
+html[data-js][data-motion="full"] .roll:focus-within { clip-path: none; }
 
 /* ---------- Hero ---------- */
-.hero { position: relative; min-height: 100svh; display: flex; align-items: center; overflow: hidden; isolation: isolate; }
-.hero-media { position: absolute; inset: 0; z-index: -2; }
-.hero-media video, .hero-media img { width: 100%; height: 100%; object-fit: cover; object-position: center 78%; }
-.hero::after {
-  content: ""; position: absolute; inset: 0; z-index: -1;
-  background: linear-gradient(180deg, rgba(7, 6, 11, .55) 0%, rgba(7, 6, 11, 0) 40%, rgba(7, 6, 11, 0) 70%, var(--ink) 100%);
+.hero { display: flex; align-items: center; padding-block: 112px var(--section); }
+@media (min-width: 1024px) { .hero { min-height: 100svh; padding-top: 96px; } }
+.hero-grid { display: grid; gap: 48px; align-items: center; }
+@media (min-width: 1024px) {
+  .hero-grid { grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: 24px; }
+  .hero-copy { grid-column: 1 / 7; }
+  .salon { grid-column: 7 / 13; }
 }
-.hero .wrap { padding-top: var(--s9); padding-bottom: 26vh; }
-.kicker { display: inline-flex; align-items: center; gap: var(--s3); color: var(--muted); margin: 0 0 var(--s5); }
-.kicker .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--c2); transition: background-color .9s; }
-h1 {
-  font: 700 clamp(48px, 9.2vw, 148px)/.92 var(--display);
-  font-variation-settings: 'opsz' 96;
-  letter-spacing: -.045em; margin: 0; max-width: 11ch;
+.hero h1 { overflow-wrap: anywhere; }
+.hero-meta { margin-top: 20px; color: var(--ink-3); }
+.hero .lead { margin-top: 20px; }
+.hero-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; margin-top: 32px; }
+.featured { margin-top: 48px; border-top: 1px solid var(--rule); max-width: 560px; }
+.featured li { border-bottom: 1px solid var(--rule); }
+.featured a {
+  display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 16px;
+  min-height: 56px; padding: 14px 0;
 }
-h1 .line { display: block; overflow: hidden; padding-bottom: .06em; }
-h1 .line > span { display: inline-block; }
-.listens {
-  position: relative; font-style: italic; font-weight: 800;
-  background: linear-gradient(90deg, var(--c1), var(--c2), var(--c3), var(--c1));
-  background-size: 300% 100%;
-  -webkit-background-clip: text; background-clip: text; color: transparent;
-  animation: shimmer 6s linear infinite;
-  padding-right: .08em;
-}
-@keyframes shimmer { to { background-position: 300% 0; } }
-.wave { display: block; width: min(560px, 80%); height: auto; margin-top: var(--s3); overflow: visible; }
-.wave path { fill: none; stroke: url(#wg); stroke-width: 3; stroke-linecap: round; stroke-dasharray: 1200; stroke-dashoffset: 1200; }
-.lede { max-width: 54ch; font-size: clamp(17px, 1.5vw, 20px); color: #CFCAE0; margin: var(--s6) 0 var(--s7); }
-.ctas { display: flex; flex-wrap: wrap; gap: var(--s3); }
-.btn {
-  display: inline-flex; align-items: center; gap: var(--s2); min-height: 48px; padding: 0 var(--s5);
-  border-radius: 999px; font: 600 15px/1 var(--body); text-decoration: none;
-  transition: transform .25s var(--ease-out), box-shadow .25s, background-color .25s, border-color .25s;
-}
-.btn svg { width: 16px; height: 16px; flex: none; }
-.btn-primary { background: var(--text); color: var(--ink); }
-.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 0 0 3px var(--ink), 0 0 0 5px var(--c2); }
-.btn-ghost { border: 1px solid var(--line-strong); color: var(--text); background: rgba(7, 6, 11, .35); backdrop-filter: blur(8px); }
-.btn-ghost:hover { transform: translateY(-2px); border-color: var(--c2); }
-.btn:active { transform: translateY(0) scale(.98); }
-.scroll-cue { position: absolute; left: 50%; bottom: var(--s6); transform: translateX(-50%); color: var(--muted); display: grid; justify-items: center; gap: var(--s2); text-decoration: none; }
-.scroll-cue i { width: 1px; height: 40px; background: linear-gradient(var(--c2), transparent); transform-origin: top; animation: drip 2s var(--ease-out) infinite; }
-@keyframes drip { 0% { transform: scaleY(0); opacity: 1; } 70% { transform: scaleY(1); opacity: 1; } 100% { transform: scaleY(1); opacity: 0; } }
+.featured .t { font: 600 1.25rem/1.15 var(--display); font-stretch: 92%; letter-spacing: -.01em; transition: color var(--dur-hover) ease; }
+@media (hover: hover) and (pointer: fine) { .featured a:hover .t { color: var(--accent-press); } }
 
-/* ---------- Sections ---------- */
-section { position: relative; }
-.section { padding: var(--s10) 0; }
-.eyebrow { color: var(--c2); margin: 0 0 var(--s4); transition: color .9s; }
-h2 { font: 700 clamp(36px, 5.4vw, 80px)/1 var(--display); letter-spacing: -.035em; margin: 0; }
-h3 { font: 700 clamp(26px, 2.6vw, 36px)/1.05 var(--display); letter-spacing: -.025em; margin: 0; }
-
-/* About */
-.about-grid { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: clamp(32px, 6vw, 96px); align-items: center; }
-.frame { position: relative; border-radius: var(--r-lg); overflow: hidden; aspect-ratio: 3 / 4; background: var(--surface); }
-.frame::after { content: ""; position: absolute; inset: 0; border-radius: inherit; box-shadow: inset 0 0 0 1px var(--line); pointer-events: none; }
-.frame video, .frame img { width: 100%; height: 100%; object-fit: cover; }
-.about-copy p { color: #CFCAE0; font-size: clamp(17px, 1.35vw, 19px); max-width: 58ch; margin: 0 0 var(--s4); }
-.about-copy p.big { font: 500 clamp(22px, 2.1vw, 30px)/1.3 var(--display); color: var(--text); letter-spacing: -.015em; margin: var(--s5) 0 var(--s5); }
-.facts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s5) var(--s6); margin: var(--s7) 0 0; padding: var(--s6) 0 0; border-top: 1px solid var(--line); }
-.facts dt { color: var(--muted); margin-bottom: var(--s1); }
-.facts dd { margin: 0; font: 600 18px/1.35 var(--display); }
-.chips { display: flex; flex-wrap: wrap; gap: var(--s2); margin-top: var(--s6); padding: 0; list-style: none; }
-.chips li { border: 1px solid var(--line); border-radius: 999px; padding: var(--s1) var(--s3); color: var(--muted); }
-
-/* Favorites */
-.fav-head { display: flex; justify-content: space-between; align-items: flex-end; gap: var(--s6); flex-wrap: wrap; margin-bottom: var(--s8); }
-.fav-head p { color: var(--muted); max-width: 44ch; margin: 0; }
-.grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: var(--s5); }
-.card {
-  --p1: var(--c1); --p2: var(--c2);
-  position: relative; display: flex; flex-direction: column;
-  background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); overflow: hidden;
-  transition: border-color .35s, transform .45s var(--ease-out), box-shadow .45s;
-}
-.card:hover, .card:focus-within { border-color: color-mix(in srgb, var(--p1) 60%, transparent); transform: translateY(-4px); box-shadow: 0 30px 80px -40px var(--p1); }
-.span-7 { grid-column: span 7; } .span-5 { grid-column: span 5; } .span-6 { grid-column: span 6; }
-.card .media { position: relative; aspect-ratio: 16 / 9; overflow: hidden; background: #0B0A12; }
-.card .media img, .card .media video { width: 100%; height: 100%; object-fit: cover; transition: transform .8s var(--ease-out); }
-.card:hover .media img, .card:hover .media video { transform: scale(1.04); }
-.media.contain img { object-fit: contain; padding: var(--s5); }
-.media.bean { background: #17110D; }
-.media.bean img { animation: bob 3s ease-in-out infinite; }
-@keyframes bob { 0%, 100% { transform: translateY(0) rotate(-1.5deg); } 50% { transform: translateY(-8px) rotate(1.5deg); } }
-.card .body { display: flex; flex-direction: column; gap: var(--s3); padding: var(--s5) var(--s5) var(--s6); flex: 1; }
-.card .slug { color: var(--muted); }
-.card p { margin: 0; color: #CFCAE0; max-width: 60ch; }
-.card a.stretch { text-decoration: none; }
-.card a.stretch::after { content: ""; position: absolute; inset: 0; z-index: 1; }
-.card a.stretch:focus-visible { outline: none; }
-.card:has(a.stretch:focus-visible) { outline: 2px solid var(--c2); outline-offset: 3px; }
-.card .title-row { display: flex; align-items: baseline; justify-content: space-between; gap: var(--s3); flex-wrap: wrap; }
-.arrow { width: 20px; height: 20px; color: var(--muted); transition: transform .35s var(--ease-out), color .35s; flex: none; }
-.card:hover .arrow { transform: translate(3px, -3px); color: var(--p2); }
-.langs { margin-top: auto; padding-top: var(--s4); }
-.bar { display: flex; height: 6px; border-radius: 999px; overflow: hidden; background: var(--surface-2); gap: 2px; }
-.bar i { display: block; height: 100%; transform-origin: left; }
-.legend { display: flex; flex-wrap: wrap; gap: var(--s1) var(--s4); margin: var(--s3) 0 0; padding: 0; list-style: none; color: var(--muted); }
-.legend li { display: inline-flex; align-items: center; gap: var(--s2); }
-.legend li::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--dot); }
-.tagline { display: flex; flex-wrap: wrap; gap: var(--s2); }
-.tag { border: 1px solid var(--line); border-radius: 999px; padding: 2px var(--s3); color: var(--muted); }
-.card.soon .body { justify-content: center; }
-.soon-mark { display: inline-flex; align-items: center; gap: var(--s2); color: var(--p2); }
-.soon-mark i { width: 8px; height: 8px; border-radius: 50%; background: var(--p2); }
-.segue-demo { font: 500 clamp(18px, 1.6vw, 22px)/1.4 var(--display); color: var(--text); padding: var(--s5); border-radius: var(--r-md); background: var(--surface-2); border: 1px solid var(--line); }
-.segue-demo .swap { display: inline-grid; color: var(--p2); }
-.segue-demo .swap span { grid-area: 1 / 1; opacity: 0; animation: swap 9s infinite; }
-.segue-demo .swap span:nth-child(2) { animation-delay: 3s; }
-.segue-demo .swap span:nth-child(3) { animation-delay: 6s; }
-@keyframes swap { 0% { opacity: 0; transform: translateY(8px); } 4%, 30% { opacity: 1; transform: none; } 34%, 100% { opacity: 0; transform: translateY(-8px); } }
-.card .hello { font: 800 clamp(48px, 6vw, 88px)/1 var(--display); letter-spacing: -.04em; color: var(--text); margin: var(--s2) 0 var(--s4); }
-.hello .swap { display: inline-grid; }
-.hello .swap span { grid-area: 1 / 1; opacity: 0; animation: swap2 6s infinite; }
-@keyframes swap2 { 0% { opacity: 0; transform: translateY(8px); } 6%, 45% { opacity: 1; transform: none; } 50%, 100% { opacity: 0; transform: translateY(-8px); } }
-.hello .swap span:nth-child(2) { animation-delay: 3s; color: var(--p2); }
-.segue-demo .caret { display: inline-block; width: 2px; height: 1em; background: var(--p2); vertical-align: -.12em; margin-left: 2px; animation: blink 1s steps(1) infinite; }
-@keyframes blink { 50% { opacity: 0; } }
-
-/* Footer */
-.outro { padding: var(--s10) 0 var(--s8); text-align: left; }
-.outro h2 { font-size: clamp(44px, 8vw, 128px); max-width: 12ch; }
-.outro .btn { margin-top: var(--s7); }
-.credits { display: flex; justify-content: space-between; flex-wrap: wrap; gap: var(--s4); color: var(--muted); padding-top: var(--s8); margin-top: var(--s9); border-top: 1px solid var(--line); }
-.credits p { margin: 0; }
-
-/* ---------- Motion: reveals and the hero load sequence (only when JS is running) ---------- */
-.js .reveal { opacity: 0; transform: translateY(28px); transition: opacity .9s var(--ease-out), transform .9s var(--ease-out); transition-delay: var(--d, 0s); }
-.js .reveal.in { opacity: 1; transform: none; }
-.js h1 .line > span { transform: translateY(105%); transition: transform 1.1s var(--ease-out); transition-delay: var(--d, 0s); }
-.js .loaded h1 .line > span { transform: none; }
-.js .loaded .wave path { transition: stroke-dashoffset 2.4s var(--ease-out) .7s; stroke-dashoffset: 0; }
-.js .bar i { transform: scaleX(0); transition: transform 1.2s var(--ease-out) .2s; }
-.js .in .bar i { transform: scaleX(1); }
-
-/* Paused: the toggle in the nav, and the OS-level reduced-motion setting */
-.paused *, .paused *::before, .paused *::after { animation-play-state: paused !important; }
-.paused .rim { opacity: .7; }
-@media (prefers-reduced-motion: reduce) {
-  html { scroll-behavior: auto; }
-  *, *::before, *::after { animation: none !important; transition-duration: .01ms !important; transition-delay: 0s !important; }
-  .rim { opacity: .7; }
-  .js .reveal, .js h1 .line > span { opacity: 1; transform: none; }
-  .wave path { stroke-dashoffset: 0; }
-  .js .bar i { transform: none; }
-  .segue-demo .swap span:first-child, .hello .swap span:first-child { opacity: 1; }
+/* The salon: three prints hung at irregular heights (desktop only). */
+.salon { display: none; }
+@media (min-width: 1024px) {
+  .salon { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 24px; align-items: start; }
+  .salon figure:nth-child(1) { grid-column: 1 / 7; }
+  .salon figure:nth-child(2) { grid-column: 1 / 4; }
+  .salon figure:nth-child(3) { grid-column: 4 / 7; margin-top: 56px; }
 }
 
-/* ---------- Responsive ---------- */
-@media (max-width: 960px) {
-  .about-grid { grid-template-columns: 1fr; }
-  .about-grid .glow-behind { max-width: 440px; }
-  .span-7, .span-5, .span-6 { grid-column: span 12; }
+/* ---------- Plates and prints ---------- */
+.plate {
+  position: relative; overflow: clip; border-radius: var(--radius-plate);
+  background: var(--room-plate, var(--plate)); aspect-ratio: var(--ratio, 16 / 10);
 }
-@media (max-width: 640px) {
-  body { font-size: 16px; }
-  .nav { padding: var(--s2) var(--s4); }
-  .nav .hide-sm { display: none; }
-  .motion-toggle .label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
-  .motion-toggle { width: 44px; justify-content: center; padding: 0; }
-  .section { padding: var(--s9) 0; }
-  .hero .wrap { padding-bottom: 30vh; }
-  .facts { grid-template-columns: 1fr; }
-  .rim .t, .rim .b { height: 14px; } .rim .l, .rim .r { width: 14px; }
-  .scroll-cue { display: none; }
+.plate img { width: 100%; height: 100%; object-fit: cover; }
+.plate.contain img { object-fit: contain; padding: 6%; mix-blend-mode: multiply; }
+.print { box-shadow: var(--shadow-print); }
+@media (max-width: 639.98px) { .plate { border-radius: 12px; } }
+
+/* ---------- Selected work: three painted rooms ---------- */
+.room { min-height: 92svh; display: flex; align-items: center; padding-block: var(--section); }
+.room-grid { display: grid; gap: 32px; align-items: center; width: 100%; }
+@media (min-width: 900px) {
+  .room-grid { grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: 24px; }
+  .room-print { grid-column: 1 / 8; }
+  .room-label { grid-column: 8 / 13; }
+  .room.flip .room-print { grid-column: 6 / 13; grid-row: 1; }
+  .room.flip .room-label { grid-column: 1 / 6; grid-row: 1; }
+}
+.room-label h3 a {
+  text-decoration: underline 2px transparent; text-underline-offset: .1em;
+  transition: color var(--dur-hover) ease, text-decoration-color var(--dur-hover) ease;
+}
+.room-line { margin-top: 16px; max-width: 40ch; color: var(--deep); font-size: clamp(1.1875rem, 1rem + .6vw, 1.5rem); line-height: 1.45; }
+.room-label .status { margin-top: 20px; }
+.room-label .chips { margin-top: 20px; --chip-edge: var(--deep); }
+.room-links { display: flex; flex-wrap: wrap; gap: 8px 20px; margin-top: 28px; }
+.room-links a { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; font-weight: 600; }
+.room-links .repo { color: var(--deep); font-weight: 500; text-decoration: underline 1px; text-underline-offset: .2em; }
+@media (hover: hover) and (pointer: fine) {
+  .room-label h3 a:hover { color: var(--accent-press); text-decoration-color: currentColor; }
+  .room-links a:hover { color: var(--accent-press); }
+}
+
+/* ---------- More work: the salon hang of mats ---------- */
+.hang { display: grid; gap: 16px; }
+@media (min-width: 768px) { .hang { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; } }
+@media (min-width: 1024px) {
+  .hang { grid-template-columns: repeat(12, minmax(0, 1fr)); }
+  .hang > :nth-child(1) { grid-area: 1 / 1 / 3 / 6; }
+  .hang > :nth-child(2) { grid-area: 1 / 6 / 2 / 13; }
+  .hang > :nth-child(3) { grid-area: 2 / 6 / 3 / 13; }
+  .hang .mat { height: 100%; }
+}
+@media (min-width: 768px) and (max-width: 1023.98px) {
+  .hang > :nth-child(3) { grid-column: 1 / -1; }
+}
+.hang > li { min-width: 0; }
+.mat {
+  position: relative; border-radius: var(--radius-panel);
+  padding: clamp(12px, 1.6vw, 24px); background: var(--wall);
+  transition: transform var(--dur-press) var(--ease-out);
+}
+.mat:has(.mat-link:active) { transform: scale(.98); }
+.mat-text { padding: clamp(20px, 1.6vw, 28px); }
+.mat-title { margin-top: clamp(14px, 1.3vw, 20px); }
+.mat-text .mat-title { margin-top: 0; }
+.mat-link {
+  color: var(--ink); text-decoration: underline 2px transparent; text-underline-offset: .14em;
+  -webkit-tap-highlight-color: transparent;
+  transition: color var(--dur-hover) ease, text-decoration-color var(--dur-hover) ease;
+}
+.mat-link::after { content: ""; position: absolute; inset: 0; border-radius: var(--radius-panel); }
+.mat-link:focus-visible { outline: none; text-decoration-color: currentColor; }
+.mat-link:focus-visible::after { outline: 2px solid var(--accent); outline-offset: 3px; }
+.mat-line { margin-top: 6px; max-width: 46ch; color: var(--deep); }
+.mat .status { margin-top: 14px; }
+.mat .chips { margin-top: 14px; --chip-edge: var(--deep); }
+@media (hover: hover) and (pointer: fine) {
+  .mat:hover .mat-link { color: var(--accent-press); text-decoration-color: currentColor; }
+}
+html[data-motion="reduce"] .mat:has(.mat-link:active) { transform: none; }
+
+/* Segue's sentence, set as it reads in the side panel. */
+.segue-demo {
+  margin-top: 16px; padding: 16px 18px; border-radius: var(--radius-plate);
+  background: color-mix(in srgb, #fff 55%, transparent); color: var(--ink-2); max-width: 46ch;
+}
+.segue-demo mark { background: var(--room-plate); color: var(--ink); border-radius: 6px; padding: 1px 6px; }
+.more-all { margin-top: clamp(32px, 3vw, 48px); }
+.more-all a { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; }
+
+/* ---------- About ---------- */
+.about-grid { display: grid; gap: 40px; }
+@media (min-width: 1024px) {
+  .about-grid { grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: 24px; }
+  .about-grid > :first-child { grid-column: 1 / 8; }
+  .about-grid > :last-child { grid-column: 8 / 13; align-self: end; }
+}
+.about-body { display: grid; gap: 16px; margin-top: 28px; color: var(--deep); }
+.facts { border-top: 1px solid color-mix(in srgb, var(--deep) 22%, transparent); }
+.facts div { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; padding: 14px 0; border-bottom: 1px solid color-mix(in srgb, var(--deep) 22%, transparent); }
+.facts dt { font-weight: 600; font-size: .8125rem; line-height: 1.6; color: var(--deep); }
+.facts dd { font: 600 1.0625rem/1.4 var(--display); font-stretch: 95%; text-align: right; }
+.about-grid .chips { margin-top: 20px; --chip-edge: var(--deep); }
+
+/* ---------- Contact ---------- */
+.contact { padding-top: var(--section); }
+.contact-head { margin-top: 24px; max-width: 22ch; }
+.contact-sub { margin-top: 16px; color: var(--deep); }
+.contact-rows { margin-top: clamp(32px, 3vw, 48px); max-width: 980px; }
+.contact-rows li + li { border-top: 1px solid color-mix(in srgb, var(--deep) 18%, transparent); }
+.contact-row {
+  --row-bleed: clamp(12px, 1.4vw, 20px);
+  position: relative; isolation: isolate;
+  display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; column-gap: 24px;
+  min-height: 72px; margin-inline: calc(-1 * var(--row-bleed)); padding: 14px var(--row-bleed);
+  border-radius: 16px; -webkit-tap-highlight-color: transparent;
+  transition: transform var(--dur-press) var(--ease-out);
+}
+.contact-row:active { transform: scale(.98); }
+html[data-motion="reduce"] .contact-row:active { transform: none; }
+.contact-row .label { color: var(--deep); }
+.contact-row .verb { display: inline-flex; align-items: center; gap: 6px; font-weight: 600; color: var(--deep); }
+.contact-paint {
+  position: absolute; inset: 0; z-index: -1; border-radius: 16px; background: var(--paint);
+  clip-path: inset(0 100% 0 0 round 16px); transition: clip-path 160ms var(--ease-out); pointer-events: none;
+}
+.contact-row:focus-visible .contact-paint { clip-path: inset(0 0 0 0 round 16px); transition-duration: 260ms; }
+@media (hover: hover) and (pointer: fine) {
+  .contact-row:hover .contact-paint { clip-path: inset(0 0 0 0 round 16px); transition-duration: 260ms; }
+}
+
+/* ---------- Footer ---------- */
+.footer { padding-block: clamp(48px, 5vw, 80px) 32px; }
+.footer-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 24px; padding-top: 24px; border-top: 1px solid color-mix(in srgb, var(--deep) 18%, transparent); }
+.footer-links { display: flex; flex-wrap: wrap; gap: 4px 20px; }
+.footer-links a, .footer-links button {
+  display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0;
+  background: none; border: 0; font: 500 .9375rem/1 var(--text); color: var(--ink); cursor: pointer;
+  text-underline-offset: .2em;
+}
+.footer-links a:hover, .footer-links button:hover { text-decoration: underline; }
+.footer small { font-size: .875rem; color: var(--deep); }
+
+/* Calm: nothing animates. */
+html[data-motion="reduce"] *, html[data-motion="reduce"] *::before, html[data-motion="reduce"] *::after {
+  transition-duration: 0ms !important; animation-duration: 0ms !important;
 }
 </style>
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
 
-<div class="rim" aria-hidden="true"><span class="t"></span><span class="r"></span><span class="b"></span><span class="l"></span></div>
+<div class="wall" aria-hidden="true"><i></i><i></i></div>
 
-<header class="nav">
-  <a class="brand" href="#top" aria-label="sussyswimmer, back to top">
-    <span class="eq" aria-hidden="true"><i></i><i></i><i></i><i></i></span>sussyswimmer
-  </a>
-  <nav aria-label="Main">
-    <ul>
-      <li class="hide-sm"><a href="#about">About</a></li>
-      <li class="hide-sm"><a href="#favorites">Favorites</a></li>
-      <li><a href="https://github.com/sussyswimmer">GitHub</a></li>
-      <li>
-        <button class="motion-toggle" type="button" aria-pressed="false">
-          <svg viewBox="0 0 12 12" aria-hidden="true"><rect x="2" y="1.5" width="2.6" height="9" rx="1" fill="currentColor"/><rect x="7.4" y="1.5" width="2.6" height="9" rx="1" fill="currentColor"/></svg>
-          <span class="label">Pause motion</span>
-        </button>
-      </li>
-    </ul>
-  </nav>
-</header>
+<a class="monogram" href="#top" data-monogram>ss<span class="sr-only">, sussyswimmer, back to top</span></a>
+<a class="btn btn-primary say-hi" href="#contact">Say hi</a>
 
 <main id="main">
-  <section class="hero" id="top" data-rim="#7C5CFF,#22D3EE,#F472B6">
-    <div class="hero-media" aria-hidden="true">
-      <video data-autoplay muted loop playsinline preload="metadata" poster="media/hero.jpg" width="1920" height="822">
-        <source src="media/hero.mp4" type="video/mp4">
-      </video>
-    </div>
-    <div class="wrap">
-      <p class="kicker mono"><span class="dot" aria-hidden="true"></span>github.com/sussyswimmer</p>
-      <h1>
-        <span class="line"><span style="--d:.1s">I build</span></span>
-        <span class="line"><span style="--d:.22s">software</span></span>
-        <span class="line"><span style="--d:.34s">that <span class="listens">listens.</span></span></span>
-      </h1>
-      <svg class="wave" viewBox="0 0 560 40" aria-hidden="true">
-        <defs><linearGradient id="wg" x1="0" x2="1"><stop offset="0" stop-color="var(--c1)"/><stop offset=".5" stop-color="var(--c2)"/><stop offset="1" stop-color="var(--c3)" stop-opacity="0"/></linearGradient></defs>
-        <path d="M2 20 C 22 20, 26 6, 40 6 S 58 34, 72 34 S 90 10, 104 10 S 120 28, 134 28 S 150 14, 164 14 S 180 24, 194 24 S 210 17, 224 17 S 240 22, 254 22 S 270 19, 284 19 S 300 21, 314 21 S 340 20, 558 20"/>
-      </svg>
-      <p class="lede reveal" style="--d:.6s">Desktop apps that glow and sing along with whatever you're playing, a workshop for running AI coding agents, and small tools that make writing easier. Built for Windows and macOS.</p>
-      <div class="ctas reveal" style="--d:.75s">
-        <a class="btn btn-primary" href="#favorites">See my favorite repos
-          <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 3v10m0 0 4-4m-4 4L4 9" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </a>
-        <a class="btn btn-ghost" href="https://github.com/sussyswimmer">Follow on GitHub
-          <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 11 11 5m0 0H6m5 0v5" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </a>
+
+  <!-- Hero: the gallery wall -->
+  <section class="hero" id="top" data-wall="gallery" aria-labelledby="hero-title">
+    <div class="container hero-grid">
+      <div class="hero-copy">
+        <h1 id="hero-title" class="type-display roll" data-roll-load>sussyswimmer</h1>
+        <p class="hero-meta type-small">github.com/sussyswimmer · Builds for Windows and macOS</p>
+        <p class="lead">I build desktop apps that react to whatever you're playing, a workshop for running AI coding agents, and small tools that make writing easier.</p>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="#work">See the work</a>
+          <a class="link" href="https://github.com/sussyswimmer">Follow on GitHub</a>
+        </div>
+        <ul class="featured" aria-label="Featured projects">
+          <li><a href="#work-rimlight"><span class="t">Rimlight</span><span class="status-tag"><i class="dot-live"></i>Live</span></a></li>
+          <li><a href="#work-undertone"><span class="t">Undertone</span><span class="status-tag"><i class="dot-building"></i>Building</span></a></li>
+          <li><a href="#work-grimoire"><span class="t">Grimoire</span><span class="status-tag"><i class="dot-building"></i>Building</span></a></li>
+        </ul>
+      </div>
+      <div class="salon" aria-hidden="true">
+        <figure class="plate print roll" data-roll-load style="--d:120ms" data-wall="periwinkle"><img src="media/repos/rimlight.jpg" alt="" width="960" height="540"></figure>
+        <figure class="plate print roll" data-roll-load style="--d:240ms;--ratio:4/3" data-wall="apricot"><img src="media/repos/undertone.jpg" alt="" width="1120" height="560"></figure>
+        <figure class="plate print roll" data-roll-load style="--d:360ms;--ratio:4/3" data-wall="blueprint"><img src="media/repos/grimoire.jpg" alt="" width="1200" height="676"></figure>
       </div>
     </div>
-    <a class="scroll-cue mono" href="#about">scroll<i aria-hidden="true"></i></a>
   </section>
 
-  <section class="section" id="about" data-rim="#A855F7,#22D3EE,#7C5CFF" aria-labelledby="about-title">
-    <div class="wrap about-grid">
-      <div class="glow-behind reveal">
-        <div class="frame">
-          <video data-autoplay muted loop playsinline preload="none" poster="media/desk-poster.jpg" width="720" height="960" aria-label="A dark desk at night; the monitor's edges glow violet, then cyan, in time with music">
-            <source src="media/desk.mp4" type="video/mp4">
-          </video>
+  <!-- Selected work: three painted rooms -->
+  <section id="work" aria-labelledby="work-title">
+    <h2 id="work-title" class="sr-only">Selected work</h2>
+
+    <article class="room" id="work-rimlight" data-wall="periwinkle">
+      <div class="container room-grid">
+        <figure class="room-print">
+          <div class="plate print"><img src="media/repos/rimlight.jpg" loading="lazy" decoding="async" width="960" height="540" alt="A dark desktop whose screen edges glow violet and cyan"></div>
+        </figure>
+        <div class="room-label">
+          <h3 class="type-title"><a href="https://github.com/sussyswimmer/bordervisualizer">Rimlight</a></h3>
+          <p class="room-line">The edges of your screen glow with your music. Colors come from the album art and the motion comes from the beat, drawn by my own HLSL and Metal shaders.</p>
+          <div class="status"><span class="status-tag"><i class="dot-live"></i>Live</span><span class="status-gloss">Live. You can use it now.</span></div>
+          <ul class="chips" aria-label="Built with"><li class="chip">C#</li><li class="chip">Swift</li><li class="chip">HLSL and Metal</li><li class="chip">Windows</li><li class="chip">macOS</li></ul>
+          <div class="room-links">
+            <a href="https://github.com/sussyswimmer/bordervisualizer">View the repo <svg class="arrow" data-dir="out" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 11.5l7-7M6 4.5h5.5V10"/></svg></a>
+            <a class="repo" href="https://github.com/sussyswimmer/bordervisualizer/releases">Free download</a>
+          </div>
         </div>
       </div>
-      <div class="about-copy">
-        <p class="eyebrow mono reveal">About me</p>
-        <h2 id="about-title" class="reveal">Hi, I'm sussyswimmer.</h2>
-        <p class="big reveal" style="--d:.1s">I make software that reacts: to the song you're playing, the sentence you just wrote, the agent you just gave a job.</p>
-        <p class="reveal" style="--d:.15s">Most of what I build lives right on the desktop. Rimlight lights up the edges of your screen with your music, and Undertone puts the lyrics on it, word by word. Lately I've been building tools for working alongside AI agents, and when I'm not doing that I'm writing a match simulator for FRC robotics.</p>
-        <p class="reveal" style="--d:.2s">I care about the small stuff: colors pulled from the album art, motion that lands on the beat, and apps that keep your data on your own machine.</p>
-        <dl class="facts reveal" style="--d:.25s">
-          <div><dt class="mono">Builds for</dt><dd>Windows &amp; macOS</dd></div>
-          <div><dt class="mono">Mostly writes</dt><dd>TypeScript, Rust, C#, Swift</dd></div>
-          <div><dt class="mono">Public repos</dt><dd>13 and counting</dd></div>
-          <div><dt class="mono">Side quest</dt><dd>FRC robotics sims &amp; RL</dd></div>
+    </article>
+
+    <article class="room flip" id="work-undertone" data-wall="apricot">
+      <div class="container room-grid">
+        <figure class="room-print">
+          <div class="plate print"><img src="media/repos/undertone.jpg" loading="lazy" decoding="async" width="1120" height="560" alt="Undertone showing synced lyrics over a rainy city at night, lighting up each word as it's sung"></div>
+        </figure>
+        <div class="room-label">
+          <h3 class="type-title"><a href="https://github.com/sussyswimmer/lyricsync">Undertone</a></h3>
+          <p class="room-line">Synced lyrics on your desktop, word by word, for whatever you're playing. Every song gets its own look, colored from its cover. Free and open source.</p>
+          <div class="status"><span class="status-tag"><i class="dot-building"></i>Building</span><span class="status-gloss">I'm building it now.</span></div>
+          <ul class="chips" aria-label="Built with"><li class="chip">Tauri 2</li><li class="chip">TypeScript</li><li class="chip">Rust</li><li class="chip">Windows</li><li class="chip">macOS</li></ul>
+          <div class="room-links">
+            <a href="https://github.com/sussyswimmer/lyricsync">View the repo <svg class="arrow" data-dir="out" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 11.5l7-7M6 4.5h5.5V10"/></svg></a>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <article class="room" id="work-grimoire" data-wall="blueprint">
+      <div class="container room-grid">
+        <figure class="room-print">
+          <div class="plate print"><img src="media/repos/grimoire.jpg" loading="lazy" decoding="async" width="1200" height="676" alt="Grimoire's tower floor: a round stone study lit by candles, with a desk for each agent around a glowing seal"></div>
+        </figure>
+        <div class="room-label">
+          <h3 class="type-title"><a href="https://github.com/sussyswimmer/agent-hub">Grimoire</a></h3>
+          <p class="room-line">A desktop app for running several coding agents at once. Each one gets a name, a brief, a budget and its own workspace, and nothing it does outside that workspace happens until you approve it.</p>
+          <div class="status"><span class="status-tag"><i class="dot-building"></i>Building</span><span class="status-gloss">I'm building it now.</span></div>
+          <ul class="chips" aria-label="Built with"><li class="chip">Tauri</li><li class="chip">Rust</li><li class="chip">React</li><li class="chip">TypeScript</li><li class="chip">Local only</li></ul>
+          <div class="room-links">
+            <a href="https://github.com/sussyswimmer/agent-hub">View the repo <svg class="arrow" data-dir="out" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 11.5l7-7M6 4.5h5.5V10"/></svg></a>
+          </div>
+        </div>
+      </div>
+    </article>
+  </section>
+
+  <!-- More work: mats on the gallery wall -->
+  <section class="section" id="more" data-wall="gallery" aria-labelledby="more-title">
+    <div class="container">
+      <h2 id="more-title" class="sr-only">More work</h2>
+      <ul class="hang">
+        <li>
+          <article class="mat roll" data-wall="highlighter">
+            <div class="plate contain" style="--ratio:4/3"><img src="media/repos/bean.webp" loading="lazy" decoding="async" width="800" height="832" alt="Bean, a curly pixel-art puppy, tilting its head"></div>
+            <h3 class="type-subhead mat-title"><a class="mat-link" href="https://github.com/sussyswimmer/lisa-suprise-gift-bean">Bean</a></h3>
+            <p class="mat-line">A little companion you can drag around next to Claude on your Mac. It reacts to the Claude app you already use, with no extra login, and your prompts never leave your computer.</p>
+            <div class="status"><span class="status-tag"><i class="dot-building"></i>Building</span><span class="status-gloss">I'm building it now.</span></div>
+          </article>
+        </li>
+        <li>
+          <article class="mat mat-text roll" data-wall="fern" style="--d:80ms">
+            <h3 class="type-subhead mat-title"><a class="mat-link" href="https://github.com/sussyswimmer/segue-transitions">Segue</a></h3>
+            <p class="mat-line">A Chrome side panel that reads the sentence you just wrote and suggests the transition your next one needs, even inside Google Docs. Around 520 phrases still work offline, with no key.</p>
+            <p class="segue-demo" aria-label="Example: after the sentence, The prototype worked on the first try, Segue suggests However">The prototype worked on the first try. <mark>However,</mark></p>
+            <div class="status"><span class="status-tag"><i class="dot-built"></i>Built</span><span class="status-gloss">Finished. Not published yet.</span></div>
+            <ul class="chips" aria-label="Built with"><li class="chip">Manifest V3</li><li class="chip">JavaScript</li><li class="chip">Chrome extension</li></ul>
+          </article>
+        </li>
+        <li>
+          <article class="mat mat-text roll" data-wall="celadon">
+            <h3 class="type-subhead mat-title"><a class="mat-link" href="https://github.com/sussyswimmer/englishlab-vn-site">EnglishLab VN</a></h3>
+            <p class="mat-line">A new website I'm starting. Nothing is pushed yet, so star the repo to see it the day it goes up.</p>
+            <div class="status"><span class="status-tag"><i class="dot-ring"></i>Planned</span><span class="status-gloss">Planned, not started.</span></div>
+          </article>
+        </li>
+      </ul>
+      <p class="more-all"><a class="link" href="https://github.com/sussyswimmer?tab=repositories">See every repo on GitHub <svg class="arrow" data-dir="right" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 8h11M9.5 4l4 4-4 4"/></svg></a></p>
+    </div>
+  </section>
+
+  <!-- About: the pool wall -->
+  <section class="section" id="about" data-wall="pool" aria-labelledby="about-title">
+    <div class="container about-grid">
+      <div>
+        <h2 id="about-title" class="type-heading">I make software that reacts to what you're doing.</h2>
+        <div class="about-body measure">
+          <p>The song you're playing, the sentence you just wrote, the agent you just gave a job. Most of what I build lives right on the desktop: Rimlight lights up the edges of your screen with your music, and Undertone puts the lyrics on it, word by word.</p>
+          <p>Lately I've been building tools for working alongside AI agents, and when I'm not doing that I'm writing a match simulator for FRC robotics. I care about the small stuff: colors pulled from the album art, motion that lands on the beat, and apps that keep your data on your own machine.</p>
+        </div>
+      </div>
+      <div>
+        <dl class="facts">
+          <div><dt>Builds for</dt><dd>Windows and macOS</dd></div>
+          <div><dt>Mostly writes</dt><dd>TypeScript, Rust, C#, Swift</dd></div>
+          <div><dt>Side quest</dt><dd>FRC robotics sims</dd></div>
         </dl>
-        <ul class="chips mono reveal" style="--d:.3s" aria-label="Tools I use">
-          <li>Tauri 2</li><li>HLSL &amp; Metal shaders</li><li>Chrome extensions</li><li>SwiftUI</li><li>Python</li><li>Claude</li><li>Higgsfield</li>
+        <ul class="chips" aria-label="Tools I use">
+          <li class="chip">Tauri 2</li><li class="chip">HLSL and Metal shaders</li><li class="chip">Chrome extensions</li><li class="chip">SwiftUI</li><li class="chip">Python</li><li class="chip">Claude</li>
         </ul>
       </div>
     </div>
   </section>
 
-  <section class="section" id="favorites" aria-labelledby="fav-title" data-rim="#7C5CFF,#22D3EE,#A78BFA">
-    <div class="wrap">
-      <div class="fav-head">
-        <div>
-          <p class="eyebrow mono reveal">Favorite repos</p>
-          <h2 id="fav-title" class="reveal">Things I've made<br>and keep coming back to.</h2>
+  <!-- Contact: the highlighter wall -->
+  <section class="contact" id="contact" data-wall="highlighter" aria-labelledby="contact-title">
+    <div class="container">
+      <h2 id="contact-title" class="type-display">Say hi.</h2>
+      <p class="type-heading contact-head">Got something that should listen? Find me on GitHub.</p>
+      <p class="contact-sub lead">Follow along, star a repo, or open an issue if something breaks.</p>
+      <ul class="contact-rows">
+        <li>
+          <a class="contact-row" href="https://github.com/sussyswimmer" style="--paint:var(--wall-pool)">
+            <span class="contact-paint" aria-hidden="true"></span>
+            <span><span class="label">GitHub</span><br><span class="type-handle">@sussyswimmer</span></span>
+            <span class="verb">Follow <svg class="arrow" data-dir="out" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 11.5l7-7M6 4.5h5.5V10"/></svg></span>
+          </a>
+        </li>
+        <li>
+          <a class="contact-row" href="https://github.com/sussyswimmer?tab=repositories" style="--paint:var(--wall-apricot)">
+            <span class="contact-paint" aria-hidden="true"></span>
+            <span><span class="label">Found a bug?</span><br><span class="type-handle">Open an issue</span></span>
+            <span class="verb">Pick a repo <svg class="arrow" data-dir="out" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 11.5l7-7M6 4.5h5.5V10"/></svg></span>
+          </a>
+        </li>
+      </ul>
+    </div>
+    <footer class="footer">
+      <div class="container footer-row">
+        <div class="footer-links">
+          <a href="#work">Work</a>
+          <a href="#about">About</a>
+          <button type="button" class="motion-toggle" aria-pressed="false">Reduce motion</button>
+          <a href="#top">Back to top <svg class="arrow" data-dir="up" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 13.5v-11M4 6.5l4-4 4 4"/></svg></a>
         </div>
-        <p class="reveal" style="--d:.1s">Watch the edges of this page as you scroll. They take on each project's colors, the same way Rimlight pulls colors from album art.</p>
+        <small>© 2026 sussyswimmer</small>
       </div>
-
-      <div class="grid">
-        <article class="card span-7 reveal" data-rim="#7C5CFF,#22D3EE,#A78BFA" style="--p1:#7C5CFF;--p2:#22D3EE">
-          <div class="media">
-            <video data-autoplay muted loop playsinline preload="none" poster="media/repos/rimlight.jpg" width="960" height="540" aria-label="A dark desktop whose edges glow and pulse with the beat">
-              <source src="media/repos/rimlight.mp4" type="video/mp4">
-            </video>
-          </div>
-          <div class="body">
-            <div class="title-row">
-              <h3><a class="stretch" href="https://github.com/sussyswimmer/bordervisualizer">Rimlight</a></h3>
-              <span class="slug mono">bordervisualizer</span>
-            </div>
-            <p>The edges of your screen glow with your music. Colors come from the album art and motion comes from the beat, drawn by custom HLSL and Metal shaders.</p>
-            <div class="tagline mono"><span class="tag">Windows</span><span class="tag">macOS</span><span class="tag">Free download</span></div>
-            <div class="langs" aria-label="Languages: C# 87.5%, Swift 7.3%, Python 2.3%, other 3%">
-              <div class="bar" aria-hidden="true"><i style="width:87.5%;background:#178600"></i><i style="width:7.3%;background:#F05138"></i><i style="width:2.3%;background:#3572A5"></i><i style="width:3%;background:#6E6A80"></i></div>
-              <ul class="legend mono" aria-hidden="true"><li style="--dot:#178600">C# 87.5%</li><li style="--dot:#F05138">Swift 7.3%</li><li style="--dot:#3572A5">Python 2.3%</li></ul>
-            </div>
-          </div>
-          <svg class="arrow" style="position:absolute;top:20px;right:20px;z-index:2;color:#fff" viewBox="0 0 20 20" aria-hidden="true"><path d="M6 14 14 6m0 0H7m7 0v7" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </article>
-
-        <article class="card span-5 reveal" style="--d:.1s;--p1:#C8642A;--p2:#F59E0B" data-rim="#C8642A,#F59E0B,#0891B2">
-          <div class="media">
-            <img src="media/repos/undertone.webp" loading="lazy" decoding="async" width="1200" height="675" alt="Undertone showing synced lyrics on a desktop, highlighting each word as it's sung">
-          </div>
-          <div class="body">
-            <div class="title-row">
-              <h3><a class="stretch" href="https://github.com/sussyswimmer/lyricsync">Undertone</a></h3>
-              <span class="slug mono">lyricsync</span>
-            </div>
-            <p>Synced lyrics on your desktop, word by word, for whatever you're playing. Every song gets its own look, colored from its cover. Free and open source.</p>
-            <div class="tagline mono"><span class="tag">Tauri 2</span><span class="tag">macOS</span><span class="tag">Windows</span></div>
-            <div class="langs" aria-label="Languages: TypeScript 66.4%, Rust 29.6%, CSS 1.9%, other 2.1%">
-              <div class="bar" aria-hidden="true"><i style="width:66.4%;background:#3178C6"></i><i style="width:29.6%;background:#DEA584"></i><i style="width:1.9%;background:#663399"></i><i style="width:2.1%;background:#6E6A80"></i></div>
-              <ul class="legend mono" aria-hidden="true"><li style="--dot:#3178C6">TypeScript 66.4%</li><li style="--dot:#DEA584">Rust 29.6%</li></ul>
-            </div>
-          </div>
-        </article>
-
-        <article class="card span-7 reveal" style="--p1:#2DD4BF;--p2:#FBBF24" data-rim="#2DD4BF,#FBBF24,#3B82F6">
-          <div class="media">
-            <img src="media/repos/grimoire.jpg" loading="lazy" decoding="async" width="1200" height="676" alt="Grimoire's tower floor: a round stone study lit by candles, with a desk for each agent around a glowing seal">
-          </div>
-          <div class="body">
-            <div class="title-row">
-              <h3><a class="stretch" href="https://github.com/sussyswimmer/agent-hub">Grimoire</a></h3>
-              <span class="slug mono">agent-hub</span>
-            </div>
-            <p>A study for working with several coding agents at once. Each agent is a familiar with its own name, brief, budget and workspace, and nothing it does outside that workspace happens until you give it your seal.</p>
-            <div class="tagline mono"><span class="tag">Local-only</span><span class="tag">No telemetry</span><span class="tag">macOS</span><span class="tag">Windows</span></div>
-            <div class="langs" aria-label="Languages: Rust 50.2%, TypeScript 48.2%, CSS 1.5%">
-              <div class="bar" aria-hidden="true"><i style="width:50.2%;background:#DEA584"></i><i style="width:48.2%;background:#3178C6"></i><i style="width:1.6%;background:#663399"></i></div>
-              <ul class="legend mono" aria-hidden="true"><li style="--dot:#DEA584">Rust 50.2%</li><li style="--dot:#3178C6">TypeScript 48.2%</li></ul>
-            </div>
-          </div>
-        </article>
-
-        <article class="card span-5 reveal" style="--d:.1s;--p1:#E8A05C;--p2:#F9C784" data-rim="#E8A05C,#F472B6,#F9C784">
-          <div class="media bean contain">
-            <img src="media/repos/bean.webp" loading="lazy" decoding="async" width="800" height="832" alt="Bean, a curly pixel-art puppy, tilting its head">
-          </div>
-          <div class="body">
-            <div class="title-row">
-              <h3><a class="stretch" href="https://github.com/sussyswimmer/lisa-suprise-gift-bean">Bean</a></h3>
-              <span class="slug mono">lisa-suprise-gift-bean</span>
-            </div>
-            <p>A draggable little companion for Claude Desktop on macOS. It watches the Claude app you already use and reacts to it, with no extra login, and your prompts never leave your Mac.</p>
-            <div class="langs" aria-label="Languages: TypeScript 53.5%, Swift 21.1%, Rust 12.3%, other 13.1%">
-              <div class="bar" aria-hidden="true"><i style="width:53.5%;background:#3178C6"></i><i style="width:21.1%;background:#F05138"></i><i style="width:12.3%;background:#DEA584"></i><i style="width:13.1%;background:#6E6A80"></i></div>
-              <ul class="legend mono" aria-hidden="true"><li style="--dot:#3178C6">TypeScript 53.5%</li><li style="--dot:#F05138">Swift 21.1%</li><li style="--dot:#DEA584">Rust 12.3%</li></ul>
-            </div>
-          </div>
-        </article>
-
-        <article class="card span-6 reveal" style="--p1:#1A73E8;--p2:#8AB4F8" data-rim="#1A73E8,#8AB4F8,#C58AF9">
-          <div class="body">
-            <div class="title-row">
-              <h3><a class="stretch" href="https://github.com/sussyswimmer/segue-transitions">Segue</a></h3>
-              <span class="slug mono">segue-transitions</span>
-            </div>
-            <div class="segue-demo" aria-hidden="true">The prototype worked on the first try. <span class="swap"><span>However,</span><span>Even so,</span><span>Still,</span></span><span class="caret"></span></div>
-            <p>A Chrome side panel that reads the sentence you just wrote and suggests the transition that fits what comes next, even inside Google Docs. Around 520 phrases still work offline with no key.</p>
-            <div class="langs" aria-label="Languages: JavaScript 75.6%, CSS 13.8%, HTML 10.6%">
-              <div class="bar" aria-hidden="true"><i style="width:75.6%;background:#F1E05A"></i><i style="width:13.8%;background:#663399"></i><i style="width:10.6%;background:#E34C26"></i></div>
-              <ul class="legend mono" aria-hidden="true"><li style="--dot:#F1E05A">JavaScript 75.6%</li><li style="--dot:#663399">CSS 13.8%</li><li style="--dot:#E34C26">HTML 10.6%</li></ul>
-            </div>
-          </div>
-        </article>
-
-        <article class="card span-6 soon reveal" style="--d:.1s;--p1:#EF4444;--p2:#FACC15" data-rim="#EF4444,#FACC15,#F97316">
-          <div class="body">
-            <p class="soon-mark mono"><i aria-hidden="true"></i>Just getting started</p>
-            <p class="hello" aria-hidden="true"><span class="swap"><span>Hello.</span><span>Xin chào.</span></span></p>
-            <div class="title-row">
-              <h3><a class="stretch" href="https://github.com/sussyswimmer/englishlab-vn-site">EnglishLab VN</a></h3>
-              <span class="slug mono">englishlab-vn-site</span>
-            </div>
-            <p>A new website I'm building. Nothing's pushed yet, so star the repo to see it the day it goes live.</p>
-          </div>
-        </article>
-      </div>
-    </div>
-  </section>
-
-  <section class="outro" data-rim="#7C5CFF,#22D3EE,#F472B6" aria-labelledby="outro-title">
-    <div class="wrap">
-      <p class="eyebrow mono reveal">What's next</p>
-      <h2 id="outro-title" class="reveal">Got something that should <span class="listens">listen?</span></h2>
-      <a class="btn btn-primary reveal" style="--d:.1s" href="https://github.com/sussyswimmer">Say hi on GitHub
-        <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 11 11 5m0 0H6m5 0v5" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      </a>
-      <div class="credits mono">
-        <p>© 2026 sussyswimmer</p>
-        <p>Hero and desk loops made with Higgsfield (GPT Image 2 + Seedance 2.0)</p>
-      </div>
-    </div>
+    </footer>
   </section>
 </main>
 
 <script>
-(() => {
-  const root = document.documentElement;
-  root.classList.add('js');
-  const reduce = matchMedia('(prefers-reduced-motion: reduce)');
-  requestAnimationFrame(() => document.querySelector('.hero').classList.add('loaded'));
+(function () {
+  var d = document.documentElement;
+  function full() { return d.getAttribute('data-motion') === 'full'; }
 
-  const nav = document.querySelector('.nav');
-  const onScroll = () => nav.classList.toggle('scrolled', scrollY > 24);
-  addEventListener('scroll', onScroll, { passive: true });
-  onScroll();
+  /* Motion toggle: Reduce motion / Full motion, remembered on this device. */
+  var toggle = document.querySelector('.motion-toggle');
+  function syncToggle() {
+    var calm = !full();
+    toggle.setAttribute('aria-pressed', String(calm));
+    toggle.textContent = calm ? 'Full motion' : 'Reduce motion';
+  }
 
-  // Fade things in once as they enter the viewport.
-  const revealer = new IntersectionObserver((entries) => {
-    for (const e of entries) if (e.isIntersecting) { e.target.classList.add('in'); revealer.unobserve(e.target); }
-  }, { rootMargin: '0px 0px -10% 0px' });
-  document.querySelectorAll('.reveal').forEach((el) => revealer.observe(el));
+  /* The roller: name and salon on load, mats as they rise into view. */
+  var rolls = document.querySelectorAll('.roll');
+  requestAnimationFrame(function () {
+    requestAnimationFrame(function () {
+      document.querySelectorAll('[data-roll-load]').forEach(function (el) { el.classList.add('in'); });
+    });
+  });
+  if ('IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+      });
+    }, { rootMargin: '0px 0px -15% 0px' });
+    rolls.forEach(function (el) { if (!el.hasAttribute('data-roll-load')) io.observe(el); });
+  } else {
+    rolls.forEach(function (el) { el.classList.add('in'); });
+  }
 
-  // Whatever sits in the middle of the screen sets the rim's colors.
-  const setRim = (el) => {
-    const [a, b, c] = el.dataset.rim.split(',');
-    root.style.setProperty('--c1', a); root.style.setProperty('--c2', b); root.style.setProperty('--c3', c);
-  };
-  const rimWatcher = new IntersectionObserver((entries) => {
-    for (const e of entries) if (e.isIntersecting) setRim(e.target);
-  }, { rootMargin: '-48% 0px -48% 0px' });
-  document.querySelectorAll('[data-rim]').forEach((el) => rimWatcher.observe(el));
+  /* The wall: one fixed wall crossfades from room to room as you scroll.
+     The last room whose top has passed the middle of the screen owns it. */
+  var wall = document.querySelector('.wall');
+  var layers = wall.querySelectorAll('i');
+  var monogram = document.querySelector('[data-monogram]');
+  var rooms = document.querySelectorAll('main > section[data-wall], #work > .room');
+  var current = null, shown = 0;
+  function activeRoom() {
+    var mid = window.innerHeight / 2, pick = rooms[0];
+    rooms.forEach(function (el) { if (el.getBoundingClientRect().top <= mid) pick = el; });
+    return pick.getAttribute('data-wall');
+  }
+  function paintWall(force) {
+    var room = activeRoom();
+    if (room === current && !force) return;
+    current = room;
+    var next = layers[1 - shown];
+    next.style.background = 'var(--wall-' + room + ')';
+    next.classList.add('on');
+    layers[shown].classList.remove('on');
+    shown = 1 - shown;
+    monogram.style.backgroundColor = 'var(--deep-' + room + ')';
+  }
+  var ticking = false;
+  window.addEventListener('scroll', function () {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(function () { ticking = false; paintWall(false); });
+  }, { passive: true });
+  window.addEventListener('resize', function () { paintWall(true); });
 
-  // Videos only play while visible, and never when motion is paused.
-  const videos = [...document.querySelectorAll('video[data-autoplay]')];
-  const visible = new Set();
-  const paused = () => root.classList.contains('paused');
-  const sync = (v) => (visible.has(v) && !paused()) ? v.play().catch(() => {}) : v.pause();
-  const videoWatcher = new IntersectionObserver((entries) => {
-    for (const e of entries) { e.isIntersecting ? visible.add(e.target) : visible.delete(e.target); sync(e.target); }
-  }, { threshold: 0.15 });
-  videos.forEach((v) => videoWatcher.observe(v));
+  toggle.addEventListener('click', function () {
+    var next = full() ? 'reduce' : 'full';
+    d.setAttribute('data-motion', next);
+    try { localStorage.setItem('motion', next); } catch (e) {}
+    syncToggle();
+    if (next === 'full') rolls.forEach(function (el) { el.classList.add('in'); });
+    paintWall(true);
+  });
 
-  const toggle = document.querySelector('.motion-toggle');
-  const label = toggle.querySelector('.label');
-  const setPaused = (on) => {
-    root.classList.toggle('paused', on);
-    toggle.setAttribute('aria-pressed', String(on));
-    label.textContent = on ? 'Play motion' : 'Pause motion';
-    videos.forEach(sync);
-  };
-  toggle.addEventListener('click', () => setPaused(!paused()));
-  setPaused(reduce.matches);
-  reduce.addEventListener('change', (e) => setPaused(e.matches));
+  syncToggle();
+  paintWall(true);
 })();
 </script>
 </body>
